@@ -5,13 +5,9 @@ add_compile_options(-std=c++17)
 
 find_package(ament_cmake REQUIRED)
 
-find_package(pluginlib REQUIRED)
-
 find_package(Eigen3 REQUIRED)
 
-find_package(geometry_msgs REQUIRED)
-find_package(tf2_eigen REQUIRED)
-
+find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 
 include_directories(
@@ -26,9 +22,14 @@ target_include_directories(kf_pos_vel_acc_plugin PUBLIC
   $<INSTALL_INTERFACE:include>
   ${EIGEN3_INCLUDE_DIRS}
 )
+target_link_libraries(kf_pos_vel_acc_plugin
+  Eigen3::Eigen
+)
 ament_target_dependencies(kf_pos_vel_acc_plugin
+  rclcpp
   pluginlib
 )
+
 pluginlib_export_plugin_description_file(
   kalman_filter
   kf_plugins.xml
@@ -43,10 +44,8 @@ install(
 add_executable(lpf_test
   src/lpf_test.cpp
 )
-
-ament_target_dependencies(lpf_test
-  geometry_msgs
-  tf2_eigen
+target_link_libraries(lpf_test
+  Eigen3::Eigen
 )
 install(
   TARGETS lpf_test
@@ -54,10 +53,11 @@ install(
   )
 
 add_executable(kf_plugin_test src/kf_plugin_test.cpp)
-
+target_link_libraries(kf_plugin_test
+  Eigen3::Eigen
+)
 ament_target_dependencies(kf_plugin_test
   rclcpp
-  tf2_eigen
   pluginlib
   )
 

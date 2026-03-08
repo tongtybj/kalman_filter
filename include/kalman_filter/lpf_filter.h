@@ -43,12 +43,6 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
-/* ros */
-#include <tf2_eigen/tf2_eigen.hpp>
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/quaternion.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
-
 class LowPassFilter
 {
 public:
@@ -65,22 +59,6 @@ public:
     setInitValues(init_vec);
   }
 
-  /* overwrite function for 3 dimension: tf::Vector3 */
-  virtual void setInitValues(const geometry_msgs::msg::Vector3& init_value)
-  {
-    Eigen::Vector3d init_vec;
-    tf2::fromMsg(init_value, init_vec);
-    setInitValues(init_vec);
-  }
-
-  /* overwrite function for 3 dimension: geometry_msgs::Point */
-  virtual void setInitValues(const geometry_msgs::msg::Point& init_value)
-  {
-    Eigen::Vector3d init_vec;
-    tf2::fromMsg(init_value, init_vec);
-    setInitValues(init_vec);
-  }
-
   virtual const Eigen::VectorXd filterFunction(const Eigen::VectorXd& input) = 0;
 
   /* overwrite function for 1 dimension */
@@ -89,32 +67,6 @@ public:
     Eigen::VectorXd in(1);
     in << input;
     return filterFunction(in)(0);
-  }
-
-  // /* overwrite function for 3 dimension: geometry_msgs::msg::Vector3*/
-  // virtual const geometry_msgs::msg::Vector3 filterFunction(const geometry_msgs::msg::Vector3& input)
-  // {
-  //   Eigen::Vector3d input_vec;
-  //   tf2::fromMsg(input, input_vec);
-  //   Eigen::Vector3d out_e = filterFunction(input_vec);
-  //   geometry_msgs::msg::Vector3 out;
-  //   out.x = out_e.x();
-  //   out.y = out_e.y();
-  //   out.z = out_e.z();
-  //   return out;
-  // }
-
-  /* overwrite function for 3 dimension: geometry_msgs::Point */
-  virtual const geometry_msgs::msg::Point filterFunction(const geometry_msgs::msg::Point& input)
-  {
-    Eigen::Vector3d input_vec;
-    tf2::fromMsg(input, input_vec);
-    Eigen::Vector3d out_e = filterFunction(input_vec);
-    geometry_msgs::msg::Point out;
-    out.x = out_e.x();
-    out.y = out_e.y();
-    out.z = out_e.z();
-    return out;
   }
 };
 
@@ -231,25 +183,10 @@ public:
     output_val_ = init_value;
   }
 
-  void setInitValues(const geometry_msgs::msg::Quaternion& init_value)
-  {
-    Eigen::Quaterniond q;
-    tf2::fromMsg(init_value, q);
-    output_val_ = q;
-  }
-
   Eigen::Quaterniond filterFunction(const Eigen::Quaterniond& input)
   {
     output_val_ = output_val_.slerp(filter_factor_, input);
     return output_val_;
-  }
-
-  geometry_msgs::msg::Quaternion filterFunction(const geometry_msgs::msg::Quaternion& input)
-  {
-    Eigen::Quaterniond q;
-    tf2::fromMsg(input, q);
-    Eigen::Quaterniond out_q = filterFunction(q);
-    return tf2::toMsg(out_q);
   }
 };
 
