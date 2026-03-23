@@ -1,4 +1,4 @@
-<library path="lib/libkf_pos_vel_acc_pluginlib">
+<library path="kf_pos_vel_acc_plugin">
   <class name="kalman_filter/kf_pos_vel_acc" type="kf_plugin::KalmanFilterPosVelAcc" base_class_type="kf_plugin::KalmanFilter">
     <description>This is a kf pos vel acc plugin.</description>
   </class>

@@ -1,33 +1,44 @@
-#include <ros/ros.h>
-#include <boost/shared_ptr.hpp>
 #include <kalman_filter/lpf_filter.h>
+#include <Eigen/Core>
+#include <iostream>
 
-int main(int argc, char** argv)
+int main()
 {
-  ros::init (argc, argv, "lpf_test");
+  {
+    IirFilter iir1d(100.0, 10.0, 1);
+    Eigen::VectorXd init1d(1);
+    init1d << 10.0;
+    iir1d.setInitValues(init1d);
+    Eigen::VectorXd out1d = iir1d.filterFunction(init1d);
+    std::cout << "[IIR 1D] output: " << out1d(0) << std::endl;
+  }
 
-  ros::NodeHandle nh;
+  {
+    IirFilter iir3d(100.0, 10.0, 3);
+    Eigen::Vector3d init3d(1.0, 1.0, 1.0);
+    iir3d.setInitValues(init3d);
+    Eigen::VectorXd out3d = iir3d.filterFunction(init3d);
+    std::cout << "[IIR 3D] output: "
+              << out3d.transpose() << std::endl;
+  }
 
-  IirFilter iir_filter_1d(100, 10, 1);
-  iir_filter_1d.setInitValues(10.0);
-  double temp_1d = iir_filter_1d.filterFunction(10.0);
-  /* TODO: write more test code */
-
-  IirFilter iir_filter_3d(100, 10, 3);
-  iir_filter_3d.setInitValues(tf::Vector3(1, 1, 1));
-  tf::Vector3 temp_3d = iir_filter_1d.filterFunction(tf::Vector3(1, 1, 1));
-  /* TODO: write more test code */
-
-  FirFilter fir_filter_1d(10, 1);
-  fir_filter_1d.setInitValues(10.0);
-  temp_1d = iir_filter_1d.filterFunction(10.0);
-  /* TODO: write more test code */
-
-  FirFilter fir_filter_3d(10, 3);
-  fir_filter_3d.setInitValues(tf::Vector3(1, 1, 1));
-  temp_3d = iir_filter_1d.filterFunction(tf::Vector3(1, 1, 1));
-  /* TODO: write more test code */
-
+  {
+    FirFilter fir1d(0.5, 1);
+    Eigen::VectorXd init1d(1);
+    init1d << 10.0;
+    fir1d.setInitValues(init1d);
+    Eigen::VectorXd out1d = fir1d.filterFunction(init1d);
+    std::cout << "[FIR 1D] output: " << out1d(0) << std::endl;
+  }
+  
+  {
+    FirFilter fir3d(0.5, 3);
+    Eigen::Vector3d init3d(1.0, 1.0, 1.0);
+    fir3d.setInitValues(init3d);
+    Eigen::VectorXd out3d = fir3d.filterFunction(init3d);
+    std::cout << "[FIR 3D] output: "
+              << out3d.transpose() << std::endl;
+  }
 
   return 0;
 }

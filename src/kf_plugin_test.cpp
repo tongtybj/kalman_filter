@@ -1,26 +1,24 @@
-#include <ros/ros.h>
-#include <boost/shared_ptr.hpp>
-#include <pluginlib/class_loader.h>
+#include <rclcpp/rclcpp.hpp>
+#include <pluginlib/class_loader.hpp>
 #include <kalman_filter/kf_base_plugin.h>
 
 int main(int argc, char** argv)
 {
-  ros::init (argc, argv, "kf_plugin_test");
-
-  ros::NodeHandle nh;
+  rclcpp::init(argc, argv);
+  auto node = rclcpp::Node::make_shared("kf_plugin_test");
 
   pluginlib::ClassLoader<kf_plugin::KalmanFilter> kf_loader("kalman_filter", "kf_plugin::KalmanFilter");
 
-  try
-     {
-       boost::shared_ptr<kf_plugin::KalmanFilter> kf_pos_vel_acc  = kf_loader.createInstance("kalman_filter/kf_pose_vel_acc");
-       kf_pos_vel_acc->initialize(std::string("test"), 0);
+  try {
+    auto kf_pos_vel_acc = kf_loader.createSharedInstance("kalman_filter/kf_pos_vel_acc");
+    kf_pos_vel_acc->initialize("test", 0);
+    RCLCPP_INFO(node->get_logger(), "Plugin loaded successfully");
+  } catch (const pluginlib::PluginlibException& ex) {
+    RCLCPP_ERROR(node->get_logger(),
+      "The plugin failed to load for some reason. Error: %s", ex.what());
+    return 1;
+  }
 
-       ROS_INFO("Result OK");
-     }
-   catch(pluginlib::PluginlibException& ex)
-     {
-       ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
-     }
-   return 0;
+  rclcpp::shutdown();
+  return 0;
 }

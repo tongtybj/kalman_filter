@@ -40,7 +40,7 @@
 #include <kalman_filter/kf_base_plugin.h>
 
 /* plugin */
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.hpp>
 
 namespace kf_plugin
 {
